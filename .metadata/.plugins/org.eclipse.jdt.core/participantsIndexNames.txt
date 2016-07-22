@@ -1,0 +1,7 @@
+INDEX VERSION 1.127
+F:\Work\Autofix_Project\Autofix\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1993067231.index
+\Autofix-API\src\main\java
+F:\Work\Autofix_Project\Autofix\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2588888351.index
+\autofix_api\src\main\java
+F:\Work\Autofix_Project\Autofix\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\64974067.index
+\api\src\main\java
