@@ -10,16 +10,19 @@ public class DBActions extends DBConnection{
 	public static List<User> getAllUsers() throws SQLException{
 		Connection connection = getConnection();
 		Map<Long, User> users = new HashMap<>();
-		String getUsersQuery = "select * from users where deleteStatus = 'No'";
+		String getUsersQuery = "select * from user where delete_status = 'No'";
 
 		try{
 			PreparedStatement ps = connection.prepareStatement(getUsersQuery);
 			ResultSet res = ps.executeQuery();
 			while(res.next()){
-				users.put(res.getLong("userId"), new User(res.getLong("userId"), res.getString("userType"), res.getString("username"),
-						res.getString("password"), res.getString("name"), res.getString("email"), res.getString("gender"), 
-						res.getLong("phone"), res.getString("address"), res.getString("location"), res.getDate("createdDate"), 
-						res.getDate("modifiedDate"), res.getString("deleteStatus"), res.getDate("deletedDate")));
+				users.put(res.getLong("user_id"), new User(res.getLong("user_id"), res.getString("user_type"), 
+						res.getString("username"), res.getString("password"), res.getString("name"), 
+						res.getString("email"), res.getString("gender"), res.getLong("phone"), 
+						res.getString("address_1"), res.getString("address_2"), res.getString("address_3"), 
+						res.getString("city"), res.getString("state"), res.getString("country"), 
+						res.getString("zip_code"), res.getTimestamp("created_at"), res.getTimestamp("modified_at"), 
+						res.getString("delete_status"), res.getTimestamp("deleted_at")));
 			}
 			res.close();
 			ps.close();
