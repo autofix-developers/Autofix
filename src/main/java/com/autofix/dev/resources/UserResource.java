@@ -15,7 +15,7 @@ import com.autofix.dev.service.UserService;
 /**
  * Root resource (exposed at "users" path)
  */
-@Path("users")
+@Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserResource {

@@ -1,34 +1,73 @@
 package com.autofix.dev.database;
 
+import com.autofix.dev.cfg.BaseConfiguration;
 import java.sql.*;
 
 class DBConnection {
-	
-	private static Connection connection = null;
-	private static String dbURL = "jdbc:mysql://localhost:3306/autofixdb?zeroDateTimeBehavior=convertToNull";
-	private static String dbUsername = "root";
-	private static String dbPassword = "DB_root@7797";
-	
-	static{
+
+    private static Connection connection = null;
+    private static BaseConfiguration config;
+    private Statement statementObj = null;
+
+    static {
+        try {
+            config = BaseConfiguration.getInstance();
+            Class.forName(config.getDBDriver());
+            System.out.println("Driver Loaded");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public final Connection getConnection() {
+
+        try {
+            connection = DriverManager.getConnection(config.getDBConnectionURL(), config.getDBPassword(), config.getDBPassword());
+            statementObj = connection.createStatement();
+            System.out.println("Connection Established");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return connection;
+    }
+
+    public final ResultSet executeSelectQuery(final String sql) {
+        ResultSet rs = null;
+        try {
+            rs = statementObj.executeQuery(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rs;
+    }
+    
+    	public final int executeDMLQuery(final String sql) {
+		int num = 0;
+                ResultSet rs ;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			System.out.println("Driver Loaded");
-		}
-		catch (ClassNotFoundException e) {
+			num = statementObj.executeUpdate(sql,
+					Statement.RETURN_GENERATED_KEYS);
+                        rs = statementObj.getGeneratedKeys();
+                                        //num = rs.getInt("updateId");
+                        if (rs.next()){
+                            num=rs.getInt(1);
+                        }
+                        System.out.print(num);
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-	static Connection getConnection(){
-		
-		try {
-			connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
-			System.out.println("Connection Established");
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return connection;
+		System.out.println(num);
+		return num;
 	}
 
+	public final void closeConnection(final Connection conn)
+			{
+		try {
+			conn.close();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

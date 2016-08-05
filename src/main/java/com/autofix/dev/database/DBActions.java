@@ -5,32 +5,31 @@ import java.util.*;
 
 import com.autofix.dev.model.User;
 
-public class DBActions extends DBConnection{
+public class DBActions {
+        private static final DBConnection db = new DBConnection();
+	private static Connection con = null;
 	
-	public static List<User> getAllUsers() throws SQLException{
-		Connection connection = getConnection();
+        public static List<User> getAllUsers() throws SQLException{
 		Map<Long, User> users = new HashMap<>();
 		String getUsersQuery = "select * from user where delete_status = 'No'";
 
 		try{
-			PreparedStatement ps = connection.prepareStatement(getUsersQuery);
-			ResultSet res = ps.executeQuery();
-			while(res.next()){
-				users.put(res.getLong("user_id"), new User(res.getLong("user_id"), res.getString("user_type"), 
+                    con = db.getConnection();
+                    ResultSet res = db.executeSelectQuery(getUsersQuery);
+                    while(res.next()){
+		    users.put(res.getLong("user_id"), new User(res.getLong("user_id"), res.getString("user_type"), 
 						res.getString("username"), res.getString("password"), res.getString("name"), 
 						res.getString("email"), res.getString("gender"), res.getLong("phone"), 
 						res.getString("address_1"), res.getString("address_2"), res.getString("address_3"), 
 						res.getString("city"), res.getString("state"), res.getString("country"), 
 						res.getString("zip_code"), res.getTimestamp("created_at"), res.getTimestamp("modified_at"), 
 						res.getString("delete_status"), res.getTimestamp("deleted_at")));
-			}
-			res.close();
-			ps.close();
-
+                    }
+                    res.close();
+                    db.closeConnection(con);
 		}catch(Exception e){
-			e.printStackTrace();
+                    e.printStackTrace();
 		}
-		connection.close();
 		return new ArrayList<User>(users.values());
 	}
 	
