@@ -1,7 +1,6 @@
 package com.autofix.dev.model;
 
 import java.util.Date;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement

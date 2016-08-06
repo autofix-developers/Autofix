@@ -22,7 +22,7 @@ class DBConnection {
     public final Connection getConnection() {
 
         try {
-            connection = DriverManager.getConnection(config.getDBConnectionURL(), config.getDBPassword(), config.getDBPassword());
+            connection = DriverManager.getConnection(config.getDBConnectionURL(), config.getDBUserName(), config.getDBPassword());
             statementObj = connection.createStatement();
             System.out.println("Connection Established");
         } catch (SQLException e) {
