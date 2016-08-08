@@ -11,5 +11,9 @@ public class UserService{
 	public List<User> getAllUsers() throws SQLException{
 		return DBActions.getAllUsers();
 	}
+	
+	public User addUser(User user) throws SQLException{
+		return DBActions.insertUserDB(user);
+	}
 
 }

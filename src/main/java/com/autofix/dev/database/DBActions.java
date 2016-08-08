@@ -7,7 +7,7 @@ import com.autofix.dev.model.User;
 
 public class DBActions {
         private static final DBConnection db = new DBConnection();
-	private static Connection con = null;
+	    private static Connection con = null;
 	
         public static List<User> getAllUsers() throws SQLException{
 		Map<Long, User> users = new HashMap<>();
@@ -33,34 +33,34 @@ public class DBActions {
 		return new ArrayList<User>(users.values());
 	}
 	
-//	public int insertUserDB(String s1, String s2, String s3, String s4,String s5, String s6, String s7, String s8,String s9) throws SQLException{
-//		con = object.getConnection();
-//		int i=0;
-//		String query = "insert into user_login(user_creator, user_type, username, password, name, gender, email, phone, location) values(?,?,?,?,?,?,?,?,?)";
-//		try {
-//			PreparedStatement ps = con.prepareStatement(query);
-//			
-//			ps.setString(1, s1);
-//			ps.setString(2, s2);
-//			ps.setString(3, s3);
-//			ps.setString(4, s4);
-//			ps.setString(5, s5);
-//			ps.setString(6, s6);
-//			ps.setString(7, s7);
-//			ps.setString(8, s8);
-//			ps.setString(9, s9);
-//			
-//			i = ps.executeUpdate();
-//			System.out.println("Records successfully inserted");
-//		}
-//		catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		con.close();
-//		
-//		return i;
-//	}
+	public static User insertUserDB(User user) throws SQLException{
+		
+		int i=0;
+		String query = "insert into autofixdb.user(user_type, username, password, name, gender, email, phone) values(?,?,?,?,?,?,?)";
+		try {
+			con = db.getConnection();
+			PreparedStatement ps = con.prepareStatement(query);
+			
+			ps.setString(1, user.getUserType());
+			ps.setString(2, user.getUsername());
+			ps.setString(3, user.getPassword());
+			ps.setString(4, user.getName());
+			ps.setString(5, user.getGender());
+			ps.setString(6, user.getEmail());
+			ps.setLong(7, user.getPhone());
+			
+			i = ps.executeUpdate();
+			System.out.println("Records successfully inserted");
+	        db.closeConnection(con);
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		if(i == 1)
+			return user;
+		else
+			return null;
+	}
 	
 	/*public int updateUserDB(String s1, String s2, String s3, String s4,String s5, String s6, String s7, String s8, String s9, String s10) throws SQLException{
 		con = object.getConn();
