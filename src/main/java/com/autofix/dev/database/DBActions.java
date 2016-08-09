@@ -6,37 +6,35 @@ import java.util.*;
 import com.autofix.dev.model.User;
 
 public class DBActions {
-        private static final DBConnection db = new DBConnection();
-	    private static Connection con = null;
+    private static final DBConnection db = new DBConnection();
+    private static Connection con = null;
 	
-        public static List<User> getAllUsers() throws SQLException{
+    public static List<User> getAllUsers() throws SQLException{
 		Map<Long, User> users = new HashMap<>();
-		String getUsersQuery = "select * from user where delete_status = 'No'";
-
+		String query = "select * from user where delete_status = 'No'";
 		try{
-                    con = db.getConnection();
-                    ResultSet res = db.executeSelectQuery(getUsersQuery);
-                    while(res.next()){
-		    users.put(res.getLong("user_id"), new User(res.getLong("user_id"), res.getString("user_type"), 
+            con = db.getConnection();
+            ResultSet res = db.executeSelectQuery(query);
+            while(res.next()){
+            	users.put(res.getLong("user_id"), new User(res.getLong("user_id"), res.getString("user_type"), 
 						res.getString("username"), res.getString("password"), res.getString("name"), 
 						res.getString("email"), res.getString("gender"), res.getLong("phone"), 
 						res.getString("address_1"), res.getString("address_2"), res.getString("address_3"), 
 						res.getString("city"), res.getString("state"), res.getString("country"), 
 						res.getString("zip_code"), res.getTimestamp("created_at"), res.getTimestamp("modified_at"), 
 						res.getString("delete_status"), res.getTimestamp("deleted_at")));
-                    }
-                    res.close();
-                    db.closeConnection(con);
+            }
+            res.close();
+            db.closeConnection(con);
 		}catch(Exception e){
-                    e.printStackTrace();
+            e.printStackTrace();
 		}
 		return new ArrayList<User>(users.values());
 	}
 	
 	public static User insertUserDB(User user) throws SQLException{
-		
 		int i=0;
-		String query = "insert into autofixdb.user(user_type, username, password, name, gender, email, phone) values(?,?,?,?,?,?,?)";
+		String query = "insert into user(user_type, username, password, name, gender, email, phone) values(?,?,?,?,?,?,?)";
 		try {
 			con = db.getConnection();
 			PreparedStatement ps = con.prepareStatement(query);
@@ -50,7 +48,7 @@ public class DBActions {
 			ps.setLong(7, user.getPhone());
 			
 			i = ps.executeUpdate();
-			System.out.println("Records successfully inserted");
+			System.out.println(i +" Records successfully inserted.");
 	        db.closeConnection(con);
 		}
 		catch (SQLException e) {
@@ -62,56 +60,55 @@ public class DBActions {
 			return null;
 	}
 	
-	/*public int updateUserDB(String s1, String s2, String s3, String s4,String s5, String s6, String s7, String s8, String s9, String s10) throws SQLException{
-		con = object.getConn();
+	public static User updateUserDB(User user) throws SQLException{
 		int i=0;
-		String query = "update user_login set username=?, password=?, user_type=?, name=?, gender=?, email=?, phone=?, "
-				+ "location=?, modified_date=now(), modified_by=? where sno=?";
-		System.out.println("Current row Id :: "+s1);
+		String query = "update user set user_type=?, username=?, password=?, name=?, gender=?, email=?, phone=? where user_id=?";
 		try {
+			con = db.getConnection();
 			PreparedStatement ps = con.prepareStatement(query);
 			
-			ps.setString(1, s2);
-			ps.setString(2, s3);
-			ps.setString(3, s4);
-			ps.setString(4, s5);
-			ps.setString(5, s6);
-			ps.setString(6, s7);
-			ps.setString(7, s8);
-			ps.setString(8, s9);
-			ps.setString(9, s10);
-			ps.setString(10, s1);
+			ps.setString(1, user.getUserType());
+			ps.setString(2, user.getUsername());
+			ps.setString(3, user.getPassword());
+			ps.setString(4, user.getName());
+			ps.setString(5, user.getGender());
+			ps.setString(6, user.getEmail());
+			ps.setLong(7, user.getPhone());
+			ps.setLong(8, user.getUserId());
 			
 			i = ps.executeUpdate();
 			System.out.println(i +" Record successfully updated");
+			db.closeConnection(con);
 		}
 		catch (SQLException e) {
 			e.printStackTrace();
 		}
-		con.close();
+		if(i == 1)
+			return user;
+		else
+			return null;
+	}
+	
+	public static int deleteUserDB(User user) throws SQLException{
+		int i=0;
+		String query = "update user set delete_status='Yes', deleted_at=now() where user_id=?";
+		try {
+			con = db.getConnection();
+			PreparedStatement ps = con.prepareStatement(query);
+			
+			ps.setLong(1, user.getUserId());
+			
+			i = ps.executeUpdate();
+			System.out.println(i +" Record successfully deleted.");
+			db.closeConnection(con);
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return i;
 	}
 	
-	public int deleteUserDB(String s1, String s2) throws SQLException{
-		con = object.getConn();
-		int i=0;
-		String query = "update user_login set deleted='Yes', deleted_date=now(), deleted_by=? where sno=?";
-		System.out.println("Current row Id :: "+s1);
-		try {
-			PreparedStatement ps = con.prepareStatement(query);
-			
-			ps.setString(1, s2);
-			ps.setString(2, s1);
-			
-			i = ps.executeUpdate();
-			System.out.println(i +" Record successfully updated");
-		}
-		catch (SQLException e) {
-			e.printStackTrace();
-		}
-		con.close();
-		return i;
-	}
+	/*
 	
 	public int insertLog(String s1, String s2, String s3) throws SQLException{
 		con = object.getConn();

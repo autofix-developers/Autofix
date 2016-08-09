@@ -61,8 +61,7 @@ class DBConnection {
 		return num;
 	}
 
-	public final void closeConnection(final Connection conn)
-			{
+	public final void closeConnection(final Connection conn){
 		try {
 			conn.close();
 			

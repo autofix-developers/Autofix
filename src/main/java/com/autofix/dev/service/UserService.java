@@ -16,4 +16,13 @@ public class UserService{
 		return DBActions.insertUserDB(user);
 	}
 
+	public int removeUser(long userId) throws SQLException {
+		User user = new User();
+		user.setUserId(userId);
+		return DBActions.deleteUserDB(user);
+	}
+
+	public User updateUser(User user) throws SQLException {
+		return DBActions.updateUserDB(user);
+	}
 }
