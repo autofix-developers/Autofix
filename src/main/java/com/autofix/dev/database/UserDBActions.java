@@ -5,7 +5,7 @@ import java.util.*;
 
 import com.autofix.dev.model.User;
 
-public class DBActions {
+public class UserDBActions {
     private static final DBConnection db = new DBConnection();
     private static Connection con = null;
 	
@@ -24,10 +24,13 @@ public class DBActions {
 						res.getString("zip_code"), res.getTimestamp("created_at"), res.getTimestamp("modified_at"), 
 						res.getString("delete_status"), res.getTimestamp("deleted_at")));
             }
-            res.close();
-            db.closeConnection(con);
-		}catch(Exception e){
+            res.close();            
+		}
+		catch(Exception e){
 			throw new SQLException(e);
+		}
+		finally{
+			db.closeConnection(con);
 		}
 		return new ArrayList<User>(users.values());
 	}
@@ -52,9 +55,12 @@ public class DBActions {
             	user = null;
             }
             res.close();
-            db.closeConnection(con);
-		}catch(Exception e){
+		}
+		catch(Exception e){
 			throw new SQLException(e);
+		}
+		finally{
+			db.closeConnection(con);
 		}
 		return user;
 	}
@@ -68,9 +74,12 @@ public class DBActions {
             	return true;
             }
             res.close();
-            db.closeConnection(con);
-		}catch(Exception e){
+		}
+    	catch(Exception e){
 			throw new SQLException(e);
+		}
+    	finally{
+			db.closeConnection(con);
 		}
     	return false;
     }
@@ -103,15 +112,19 @@ public class DBActions {
 				while(res.next()){
 					user.setUserId(res.getLong("last_insert_id()"));
 				}
-				db.closeConnection(con);
-				return user;
+				res.close();
+			}
+			else{
+				user = null;
 			}
 		}
 		catch (SQLException e) {
 			throw new SQLException(e);
 		}
-		db.closeConnection(con);
-		return null;
+		finally{
+			db.closeConnection(con);
+		}
+		return user;
 	}
 	
 	public static User updateUserDB(User user) throws SQLException{
@@ -136,15 +149,18 @@ public class DBActions {
 			
 			if(i == 1){
 				user = getUser(user);
-				db.closeConnection(con);
-				return user;
+			}
+			else{
+				user = null;
 			}
 		}
 		catch (SQLException e) {
 			throw new SQLException(e);
 		}
-		db.closeConnection(con);
-		return null;
+		finally{
+			db.closeConnection(con);
+		}
+		return user;
 	}
 	
 	public static int deleteUserDB(User user) throws SQLException{
@@ -158,10 +174,12 @@ public class DBActions {
 			
 			i = ps.executeUpdate();
 			System.out.println(i +" Record successfully deleted.");
-			db.closeConnection(con);
 		}
 		catch (SQLException e) {
 			throw new SQLException(e);
+		}
+		finally{
+			db.closeConnection(con);
 		}
 		return i;
 	}
