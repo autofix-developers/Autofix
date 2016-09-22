@@ -27,12 +27,59 @@ public class DBActions {
             res.close();
             db.closeConnection(con);
 		}catch(Exception e){
-            e.printStackTrace();
+			throw new SQLException(e);
 		}
 		return new ArrayList<User>(users.values());
 	}
+    
+    public static User getUser(User user) throws SQLException{
+		String query = "select * from user where delete_status = 'No' and user_id = " +user.getUserId();
+		try{
+            con = db.getConnection();
+            ResultSet res = db.executeSelectQuery(query);
+            if(res.isBeforeFirst()){
+            	while(res.next()){
+                	user = new User(res.getLong("user_id"), res.getString("user_type"), 
+    				res.getString("username"), res.getString("password"), res.getString("name"), 
+    				res.getString("email"), res.getString("gender"), res.getLong("phone"), 
+    				res.getString("address_1"), res.getString("address_2"), res.getString("address_3"), 
+    				res.getString("city"), res.getString("state"), res.getString("country"), 
+    				res.getString("zip_code"), res.getTimestamp("created_at"), res.getTimestamp("modified_at"), 
+    				res.getString("delete_status"), res.getTimestamp("deleted_at"));
+                }
+            }
+            else{
+            	user = null;
+            }
+            res.close();
+            db.closeConnection(con);
+		}catch(Exception e){
+			throw new SQLException(e);
+		}
+		return user;
+	}
+    
+    public static boolean isUserExists(User user) throws SQLException{
+    	String query = "select * from user where email = '" +user.getEmail() +"' or phone = " +user.getPhone();
+    	try{
+            con = db.getConnection();
+            ResultSet res = db.executeSelectQuery(query);
+            if(res.isBeforeFirst()){
+            	return true;
+            }
+            res.close();
+            db.closeConnection(con);
+		}catch(Exception e){
+			throw new SQLException(e);
+		}
+    	return false;
+    }
 	
 	public static User insertUserDB(User user) throws SQLException{
+		if(isUserExists(user)){
+			throw new SQLException("SQLError - error while inserting user details in database. "
+					+ "The email or phone already exists in the database");
+		}
 		int i=0;
 		String query = "insert into user(user_type, username, password, name, gender, email, phone) values(?,?,?,?,?,?,?)";
 		try {
@@ -49,20 +96,28 @@ public class DBActions {
 			
 			i = ps.executeUpdate();
 			System.out.println(i +" Records successfully inserted.");
-	        db.closeConnection(con);
+			
+			if(i == 1){
+				query = "select last_insert_id()";
+				ResultSet res = db.executeSelectQuery(query);
+				while(res.next()){
+					user.setUserId(res.getLong("last_insert_id()"));
+				}
+				db.closeConnection(con);
+				return user;
+			}
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			throw new SQLException(e);
 		}
-		if(i == 1)
-			return user;
-		else
-			return null;
+		db.closeConnection(con);
+		return null;
 	}
 	
 	public static User updateUserDB(User user) throws SQLException{
 		int i=0;
-		String query = "update user set user_type=?, username=?, password=?, name=?, gender=?, email=?, phone=? where user_id=?";
+		String query = "update user set user_type=?, username=?, password=?, name=?, gender=?, email=?, phone=? "
+				+ "where delete_status = 'No' and user_id=?";
 		try {
 			con = db.getConnection();
 			PreparedStatement ps = con.prepareStatement(query);
@@ -78,20 +133,23 @@ public class DBActions {
 			
 			i = ps.executeUpdate();
 			System.out.println(i +" Record successfully updated");
-			db.closeConnection(con);
+			
+			if(i == 1){
+				user = getUser(user);
+				db.closeConnection(con);
+				return user;
+			}
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			throw new SQLException(e);
 		}
-		if(i == 1)
-			return user;
-		else
-			return null;
+		db.closeConnection(con);
+		return null;
 	}
 	
 	public static int deleteUserDB(User user) throws SQLException{
 		int i=0;
-		String query = "update user set delete_status='Yes', deleted_at=now() where user_id=?";
+		String query = "update user set delete_status='Yes', deleted_at=now() where delete_status = 'No' and user_id=?";
 		try {
 			con = db.getConnection();
 			PreparedStatement ps = con.prepareStatement(query);
@@ -103,7 +161,7 @@ public class DBActions {
 			db.closeConnection(con);
 		}
 		catch (SQLException e) {
-			e.printStackTrace();
+			throw new SQLException(e);
 		}
 		return i;
 	}
