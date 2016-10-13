@@ -49,4 +49,12 @@ public class UserService{
 		}
 		return user;
 	}
+
+        public User getUserByUnameAndPass(String username, String password) throws SQLException{
+                User user = new User();
+		user.setUsername(username);
+                user.setPassword(password);
+		user = UserDBActions.getUserByUnameAndPass(user);
+		return user;	
+        }
 }

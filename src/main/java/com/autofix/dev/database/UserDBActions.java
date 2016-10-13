@@ -34,7 +34,7 @@ public class UserDBActions {
 		}
 		return new ArrayList<User>(users.values());
 	}
-    
+     
     public static User getUser(User user) throws SQLException{
 		String query = "select * from user where delete_status = 'No' and user_id = " +user.getUserId();
 		try{
@@ -65,6 +65,35 @@ public class UserDBActions {
 		return user;
 	}
     
+    public static User getUserByUnameAndPass(User user) throws SQLException{
+		String query = "select * from user where delete_status = 'No' and username = '" +user.getUsername() + "' and password = '" + user.getPassword() + "'";
+		try{
+            con = db.getConnection();
+            ResultSet res = db.executeSelectQuery(query);
+            if(res.isBeforeFirst()){
+            	while(res.next()){
+                	user = new User(res.getLong("user_id"), res.getString("user_type"), 
+    				res.getString("username"), res.getString("password"), res.getString("name"), 
+    				res.getString("email"), res.getString("gender"), res.getLong("phone"), 
+    				res.getString("address_1"), res.getString("address_2"), res.getString("address_3"), 
+    				res.getString("city"), res.getString("state"), res.getString("country"), 
+    				res.getString("zip_code"), res.getTimestamp("created_at"), res.getTimestamp("modified_at"), 
+    				res.getString("delete_status"), res.getTimestamp("deleted_at"));
+                }
+            }
+            else{
+            	user = null;
+            }
+            res.close();
+		}
+		catch(Exception e){
+			throw new SQLException(e);
+		}
+		finally{
+			db.closeConnection(con);
+		}
+		return user;
+	}
     public static boolean isUserExists(User user) throws SQLException{
     	String query = "select * from user where email = '" +user.getEmail() +"' or phone = " +user.getPhone();
     	try{

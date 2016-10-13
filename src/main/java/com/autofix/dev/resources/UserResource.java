@@ -23,7 +23,7 @@ import com.autofix.dev.validation.ClientRequestValidator;
 /**
  * Root resource (exposed at "users" path)
  */
-@Path("users")
+@Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserResource {
@@ -35,7 +35,7 @@ public class UserResource {
     public List<User> getUsers() throws SQLException {
         return userService.getAllUsers();
     }
-    
+
     @GET
     @Path("/{userId}")
     public User getUser(@PathParam("userId") long userId) throws SQLException, NoContentException {
